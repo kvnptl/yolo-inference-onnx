@@ -102,6 +102,12 @@ if __name__ == '__main__':
     # Image file.
     imageFile = "images/zidane.jpg"
 
+    # Load class names.
+    classesFile = "config/coco.names"
+
+    # Model weights file
+    modelWeights = "weights/yolov5m.onnx"
+
     # check if file exists.
     if not os.path.isfile(imageFile):
         print("File {} does not exist.".format(imageFile))
@@ -109,9 +115,6 @@ if __name__ == '__main__':
 
     # Read the image.
     frame = cv2.imread(imageFile)
-
-    # Load class names.
-    classesFile = "config/coco.names"
 
     # check if file exists.
     if not os.path.isfile(classesFile):
@@ -121,9 +124,6 @@ if __name__ == '__main__':
     classes = None
     with open(classesFile, 'rt') as f:
         classes = f.read().rstrip('\n').split('\n')
-
-    # Give the weight files to the model and load the network using them.
-    modelWeights = "weights/yolov5m.onnx"
 
     # check if file exists.
     if not os.path.isfile(modelWeights):
