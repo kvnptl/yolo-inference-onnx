@@ -154,6 +154,7 @@ int main()
     // Model weights file
     string modelWeights = "../weights/ss22_competition_best.onnx";
 
+    // check if image file exists
     ifstream f1(imageFile.c_str());
     if (!f1.good())
     {
