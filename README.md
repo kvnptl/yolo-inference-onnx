@@ -15,6 +15,7 @@ Run YOLO inference in C++ or Python using ONNX model
 
 ### Use below drop-down to see the steps
 
+<!-- C++ -->
 <details><summary>C++</summary><br/>
 
 ### Build
@@ -43,7 +44,11 @@ make
 ```bash
 ./yolo_inference
 ```
+
+Note: there is also a header file `include/yolo_inference.hpp` which contains the inference function. You can use that function in your own code if you want.
 </details>
+
+<!-- ### Python -->
 
 <details><summary>Python</summary><br/>
 
@@ -52,4 +57,3 @@ python3 src/yolo_inference.py
 ```
 
 </details>
-<!-- ### Python -->
