@@ -8,6 +8,7 @@ Run YOLO inference in C++ or Python using ONNX model
 - Python 3.8
 - CMake 3.5.1
 - C++ 17
+- Yolov5 
 
 # Config
 
