@@ -2,6 +2,8 @@
 
 Run YOLO inference in C++ or Python using ONNX model
 
+![output](https://user-images.githubusercontent.com/47410011/210271002-06f079c0-7c30-4401-b0df-c0c92cb6043a.jpg)*Pic credit: Matthias Hangst/Getty Images*
+
 ### Prerequisites/Tested On
 
 - OpenCV 4.6.0
