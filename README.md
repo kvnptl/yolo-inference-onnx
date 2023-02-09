@@ -48,7 +48,7 @@ make
 ./yolo_inference
 ```
 
-Note: there is also a header file `include/yolo_inference.hpp` which contains the inference function. You can use that function in your own code if you want.
+(OPTIONAL) Note: there is also a header file `include/yolo_inference.hpp` which contains the inference function. You can use that function in your own code if you want.
 </details>
 
 <!-- ### Python -->
