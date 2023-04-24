@@ -46,7 +46,7 @@ def pre_process(input_image, net):
     return outputs
 
 
-def post_process(input_image, outputs):
+def post_process(input_image, outputs, classes):
     # Lists to hold respective values while unwrapping.
     class_ids = []
     confidences = []
@@ -97,17 +97,7 @@ def post_process(input_image, outputs):
     return input_image
 
 
-if __name__ == '__main__':
-    
-    # Image file.
-    imageFile = "images/zidane.jpg"
-
-    # Load class names.
-    classesFile = "config/coco.names"
-
-    # Model weights file
-    modelWeights = "weights/yolov5m.onnx"
-
+def main(imageFile, classesFile, modelWeights, showImage=False):
     # check if file exists.
     if not os.path.isfile(imageFile):
         print("File {} does not exist.".format(imageFile))
@@ -137,18 +127,58 @@ if __name__ == '__main__':
     detections = pre_process(frame, net)
     
     # Run NMS and draw boxes.
-    img = post_process(frame.copy(), detections)
+    img = post_process(frame.copy(), detections, classes)
     
     """
     Put efficiency information. The function getPerfProfile returns the overall time for inference(t) 
     and the timings for each of the layers(in layersTimes).
     """
     t, _ = net.getPerfProfile()
-    label = 'Inference time: %.2f ms' % (t * 1000.0 / cv2.getTickFrequency())
-    print(label)
-    cv2.putText(img, label, (20, 40), FONT_FACE, FONT_SCALE,
-                (0, 0, 255), THICKNESS, cv2.LINE_AA)
-    cv2.imshow('Output', img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    inferenceTime = 'Inference time: %.2f ms' % (
+        t * 1000.0 / cv2.getTickFrequency())
+    print(inferenceTime)
 
+    if showImage:
+        cv2.putText(img, inferenceTime, (20, 40), FONT_FACE, FONT_SCALE,
+                    (0, 0, 255), THICKNESS, cv2.LINE_AA)
+
+        # Show the image.
+        cv2.imshow("Prediction", img)
+        cv2.waitKey(0)
+
+
+if __name__ == '__main__':
+
+    singleImage = False  # False for inference on multiple images
+    showImage = True  # True to show image
+
+    # Image file.
+    imageFile = "images/zidane.jpg"
+
+    # Image directory
+    imageDir = "images"
+
+    # Load class names
+    classesFile = "config/coco.names"
+
+    # Model weights file
+    modelWeights = "weights/yolov5m.onnx"
+
+    if singleImage:
+        main(imageFile, classesFile, modelWeights, showImage)
+        print("Done")
+
+    else:
+        # get all images in the directory
+        imageFiles = []
+        try:
+            imageFiles = [os.path.join(imageDir, f) for f in os.listdir(
+                imageDir) if os.path.isfile(os.path.join(imageDir, f))]
+        except OSError as e:
+            print(e)
+            exit()
+
+        for imageFile in imageFiles:
+            main(imageFile, classesFile, modelWeights, showImage)
+
+        print("Done")
