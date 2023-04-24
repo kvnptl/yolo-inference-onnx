@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import os
+from tqdm import tqdm
 
 # Constants.
 INPUT_WIDTH = 640
@@ -97,7 +98,7 @@ def post_process(input_image, outputs, classes):
     return input_image
 
 
-def main(imageFile, classesFile, modelWeights, showImage=False):
+def main(imageFile, classesFile, modelWeights):
     # check if file exists.
     if not os.path.isfile(imageFile):
         print("File {} does not exist.".format(imageFile))
@@ -133,24 +134,17 @@ def main(imageFile, classesFile, modelWeights, showImage=False):
     Put efficiency information. The function getPerfProfile returns the overall time for inference(t) 
     and the timings for each of the layers(in layersTimes).
     """
-    t, _ = net.getPerfProfile()
-    inferenceTime = 'Inference time: %.2f ms' % (
-        t * 1000.0 / cv2.getTickFrequency())
-    print(inferenceTime)
-
-    if showImage:
-        cv2.putText(img, inferenceTime, (20, 40), FONT_FACE, FONT_SCALE,
-                    (0, 0, 255), THICKNESS, cv2.LINE_AA)
-
-        # Show the image.
-        cv2.imshow("Prediction", img)
-        cv2.waitKey(0)
+    inferenceTime, _ = net.getPerfProfile()
+    inferenceTime = inferenceTime * 1000.0 / cv2.getTickFrequency()
+    
+    return img, inferenceTime
 
 
 if __name__ == '__main__':
 
-    singleImage = False  # False for inference on multiple images
+    singleImage = True  # False for inference on multiple images
     showImage = True  # True to show image
+    createVideo = False  # True to create a video on all predicted images (only if singleImage is False)
 
     # Image file.
     imageFile = "images/zidane.jpg"
@@ -164,13 +158,28 @@ if __name__ == '__main__':
     # Model weights file
     modelWeights = "weights/yolov5m.onnx"
 
+    # Inference on single image
     if singleImage:
-        main(imageFile, classesFile, modelWeights, showImage)
+        img, inferenceTime = main(imageFile, classesFile, modelWeights)
+        
+        if showImage:
+            inferenceTime = 'Inference time: %.2f ms' % (inferenceTime)
+            cv2.putText(img, inferenceTime, (20, 40), FONT_FACE, FONT_SCALE,
+                        (0, 0, 255), THICKNESS, cv2.LINE_AA)
+            print(inferenceTime)
+
+            # Show the image.
+            cv2.imshow("Prediction", img)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+        
         print("Done")
 
+    # inference on multiple images
     else:
         # get all images in the directory
         imageFiles = []
+        inferenceTimes = []
         try:
             imageFiles = [os.path.join(imageDir, f) for f in os.listdir(
                 imageDir) if os.path.isfile(os.path.join(imageDir, f))]
@@ -178,7 +187,43 @@ if __name__ == '__main__':
             print(e)
             exit()
 
-        for imageFile in imageFiles:
-            main(imageFile, classesFile, modelWeights, showImage)
+        if createVideo:
+            frame = cv2.imread(imageFiles[0])
+            height, width, layers = frame.shape
+            # create the video writer
+            video = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 2, (width, height))
+            inferenceTimes = []
 
-        print("Done")
+        for imageFile in tqdm(imageFiles):
+            img, inferenceTime = main(imageFile, classesFile, modelWeights)
+            
+            if createVideo:
+                # don't show the image
+                inferenceTimes.append(inferenceTime)
+                inferenceTime = 'Inference time: %.2f ms' % (inferenceTime)
+                cv2.putText(img, inferenceTime, (20, 40), FONT_FACE, FONT_SCALE,
+                            (0, 0, 255), THICKNESS, cv2.LINE_AA)
+
+                video.write(img)
+                
+            elif showImage:
+                inferenceTimes.append(inferenceTime)
+                inferenceTime = 'Inference time: %.2f ms' % (inferenceTime)
+                cv2.putText(img, inferenceTime, (20, 40), FONT_FACE, FONT_SCALE,
+                            (0, 0, 255), THICKNESS, cv2.LINE_AA)
+                print(inferenceTime)
+                
+                # Show the image.
+                cv2.imshow("Prediction", img)
+                cv2.waitKey(0)
+
+            else:
+                inferenceTimes.append(inferenceTime)
+                inferenceTime = 'Inference time: %.2f ms' % (inferenceTime)
+                print(inferenceTime)
+                
+        if createVideo:
+            video.release()
+
+        print("\nAverage inference time: ", np.mean(inferenceTimes))
+        print("\nDone")
