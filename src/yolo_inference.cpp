@@ -146,13 +146,13 @@ Mat post_process(Mat &input_image, vector<Mat> &outputs, const vector<string> &c
 int main()
 {
     // Image file
-    string imageFile = "../images/zidane.jpg";
+    string imageFile = "../images/bins.jpg";
 
     // Class names file
-    string classFile = "../config/coco.names";
+    string classFile = "../config/bins_dataset_yolo.names";
 
     // Model weights file
-    string modelWeights = "../weights/yolov5m.onnx";
+    string modelWeights = "../weights/epoch_1999.onnx";
 
     ifstream f1(imageFile.c_str());
     if (!f1.good())
