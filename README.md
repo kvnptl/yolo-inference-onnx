@@ -6,11 +6,11 @@ Run YOLO inference in C++ or Python using ONNX model
 
 ### Prerequisites/Tested On
 
-- OpenCV 4.6.0
-- Python 3.8
+- OpenCV 4.7.0
+- Python 3.10
 - CMake 3.5.1
 - C++ 17
-- Yolov5 
+- Tested Yolov5 & Yolov7 ONNX models
 
 # Config
 
